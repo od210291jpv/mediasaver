@@ -1,0 +1,20 @@
+{% extends "index_new.html" %}
+
+{% block content %}
+
+<form action="{% url 'add_image' %}", method="post", enctype="multipart/form-data", class="form-horizontal", name="image">
+		<input type="hidden", name="path-to-image", class="form-control"/>
+		<div class="form-group">
+			<label for="image_name", class="control-label">Image name</label>
+			<input type="text", name="image_name", id="img_name", class="form-control"/>
+		</div>
+		<div class="form-group">
+			<label for="image_path", class="control-label">Path to the image</label>
+			<input type="file", name="image_path", id="img_path", class="form-control">
+		</div>
+		<div class="form-group">
+			<input type='submit' name='add_button', class="form-control"/>
+		</div>
+</form>
+
+{% endblock content %}

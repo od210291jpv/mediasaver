@@ -1,0 +1,34 @@
+/* Global Styles */
+h1, h2, h3, h4, h5, h6 {
+font-weight: bold;
+}
+
+
+/* знайшли елемент футера по його унікальному ідентифікатору
+footer */
+#footer {
+/* задаємо верхню межу елемента: ширина лінії, тип лінії, колір
+лінії */
+border-top: 1px solid #dddddd;
+/* задаємо внутрішню відстань елемента до верхнього краю */
+padding-top: 10px;
+}
+
+/*Social icons in footer*/
+#Instagram {
+margin-top: 3px;
+}
+
+#Twitter {
+margin-top: 3px;
+}
+
+#Facebook {
+margin-top: 3px;
+}
+
+/*Side navigation menu*/
+
+#navigation{
+margin-left: 5px;
+}

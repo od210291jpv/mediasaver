@@ -1,0 +1,31 @@
+{% extends 'index_new.html' %}
+{% load static from staticfiles %}
+
+{% block content %}
+				{% for image in images %}
+				<div class="col-xs-4">
+				    <a href="{{ image.path.url }}">
+					<image style="border-radius: 10%" height="130" width="130" src="{{ image.path.url }}">
+				    </a>
+				    <div>
+				    <b><a href='{{ image.path.url }}'>{{ image.name }}</a></b>
+				    </div>
+				</div>
+			        {% endfor %}
+
+<div class='row'>
+    <div class="col-xs-8">
+ {% if images.has_other_pages %}
+                    <nav>
+                        <ul class="pagination">
+                            <li><a href="{% url "hidden" %}?page=1">&laquo;</a></li>
+                            {% for p in images.paginator.page_range %}
+                            <li{% if images.number == p %} class="active" {% endif %}>
+                                <a href="{% url "hidden" %}?page={{ p }}"> {{ p }} </a></li> {% endfor %}
+                            <li><a href="{% url "hidden" %}?page={{ images.paginator.num_pages }}">&raquo;</a></li>
+                        </ul>
+                    </nav>
+                    {% endif %}
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,77 @@
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--<style type="text/css">.col-xs-4, .col-xs-8, .col-xs-1, .col-xs-2, .col-xs-10, .col-xs-12, .col-xs-1, .col-xs-6, .col-xs-3 {border:1px solid red;}</style>-->
+    <style type="text/css">
+        #footer {
+        background: silver
+}
+    </style>
+
+    <link rel="stylesheet" href='{{ PORTAL_URL }}{% static "css/main.css" %}'>
+
+    <link rel="stylesheet" href="{{ PORTAL_URL }}{% static 'css/bootstrap.css' %}">
+</head>
+<body>
+    <div class="row" id="header">
+                <!--<///header title-->
+        <div class="col-xs-8">
+            <h1 align="right">Welcome to PyHome Media</h1>
+        </div>
+                <!--Header logo-->
+        <div class="col-xs-4">
+            <img src="{{ PORTAL_URL }}{% static 'images/logo.png' %}", width="170", height="70">
+        </div>
+    </div>
+    <div class="row" id="content">
+        <!--navigation bar-->
+        <div class="col-xs-2" id="navigation">
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <h3><a class="brand" href="{{ PORTAL_URL }}">Site Navigation</a></h3>
+                    <ul class="nav">
+                        <li class="active"><a href="{{ PORTAL_URL }}/profile"><b>Profile</b></a></li>
+                        <li><a href="{{ PORTAL_URL  }}/images"><b>All images</b></a></li>
+                        <li><a href="{{ PORTAL_URL }}/add_image"><b>Add Image</b></a></li>
+                        <li><a href="#"><b>Categories</b></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--Main section-->
+        <div class="col-xs-6">
+            <div class="row">
+                <div class="col-xs-12"><hr></div>
+            </div>
+            <div class="row">
+                {% block content %}{% endblock content %}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer navbar-fixed-bottom" id="footer">
+        <div class="row">
+            <div class="col-xs-2">
+                <img src="{{ PORTAL_URL }}{% static 'images/logo.png' %}", width="170", height="80">
+                <div align="left">
+                    <b><a href="#">&copy OpenLicence</a></b> PyHome Media
+                </div>
+            </div>
+            <div class="col-xs-10">
+                <h4>Follow us at social:</h4>
+                <div><img src="{{ PORTAL_URL }}{% static 'images/Instagram.png' %}" width="25" height="25" id="Instagram"><b><a href="http://instagram.com">Instagram</a></b></div>
+                <div><img src="{{ PORTAL_URL }}{% static 'images/Twitter.png' %}" width="25" height="25" id="Twitter"><b><a href="http://twitter.com">Twitter</a></b></div>
+                <div><img src="{{ PORTAL_URL }}{% static 'images/Facebook.png' %}" width="25" height="25" id="Facebook"><b><a href="http://facebook.com">Facebook</a></b></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script src="{{ PORTAL_URL }}{% static 'js/bootstrap.js' %}"></script>
+</body>
+</html>
