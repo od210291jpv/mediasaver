@@ -23,15 +23,14 @@ from Application.views import *
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    # url(r'api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # url(r'^playlist/(?P<plid>\d+)/view/$', show_playlist, name='show_playlist'),
     url(r'^images/$', images_list, name='images'),
     url(r'^hidden/$', hidden_list, name='hidden'),
     url(r'^$', index, name='index'),
-    url(r'^home/$', home, name='home'),
     url(r'^test/$', test, name='test'),
     url(r'^add_image/$', upload_image, name='add_image'),
-    url(r'^get_json_images/$', images_json, name='json_images')
+    url(r'^get_json_images/$', images_json, name='json_images'),
+    url(r'^register/$', create_user, name='create_user'),
+    url(r'^login/$', login, name='login')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
