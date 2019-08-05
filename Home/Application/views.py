@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse 
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from models import ImageFile
 from Home.settings import PORTAL_URL
+from django.http import HttpResponseForbidden
 from models import ImageFile
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -72,9 +73,14 @@ def images_json(request):
 
 def create_user(request):
     if request.method == "POST":
-        user = User.objects.create_user(request.POST['username'], request.POST['email'], request.POST['password'], is_active=False)
-        user.save()
-        return JsonResponse({'state': 'ok'})
+        registered_usr = User.objects.filter(username=request.POST['username'])
+        if len(registered_usr) > 0:
+            return HttpResponseForbidden("User already exists")
+            pass
+        else:
+            user = User.objects.create_user(request.POST['username'], request.POST['email'], request.POST['password'], is_active=False)
+            user.save()
+            return JsonResponse({'state': 'ok'})
     else:
         return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
 
