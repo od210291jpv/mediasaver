@@ -80,7 +80,8 @@ def create_user(request):
         else:
             user = User.objects.create_user(request.POST['username'], request.POST['email'], request.POST['password'], is_active=False)
             user.save()
-            user_acc = UserAccount(name=request.POST['username'], avatar=request.FILES['image_path'])
+            user_acc = UserAccount(name=request.POST['username'])
+            # user_acc = UserAccount(name=request.POST['username'], avatar=request.FILES['image_path'])
             user_acc.save()
             return JsonResponse({'state': 'ok'})
     else:
