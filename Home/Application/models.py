@@ -4,6 +4,23 @@ from Home.settings import MEDIA_ROOT
 # Create your models here.
 
 
+class UserAccount(models.Model):
+
+    name = models.CharField(
+        blank=False,
+        max_length=30,
+        verbose_name=u'UserAccount name'
+    )
+
+    avatar = models.ImageField(
+        blank=True,
+        upload_to='images'
+    )
+
+    def __str__(self):
+        return "%s %s" % (self.name, self.avatar)
+
+
 class ImageFile(models.Model):
 
     class Meta(object):
@@ -31,6 +48,13 @@ class ImageFile(models.Model):
         blank=False,
         verbose_name=u'Likes amount',
         default=0
+    )
+
+    publisher = models.ForeignKey(
+        UserAccount,
+        on_delete=models.CASCADE,
+        blank=True,
+        verbose_name=u'Publisher'
     )
 
     def __unicode__(self):
