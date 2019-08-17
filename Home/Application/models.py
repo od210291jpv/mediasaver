@@ -54,6 +54,7 @@ class ImageFile(models.Model):
         UserAccount,
         on_delete=models.CASCADE,
         blank=True,
+        null=True,
         verbose_name=u'Publisher'
     )
 
