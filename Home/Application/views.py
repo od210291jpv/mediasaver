@@ -107,8 +107,8 @@ def login(request):
 
 def get_my_posts(request):
     if request.method == 'POST':
-        if User.objects.filter(username=request.POST['username']) is not None:
-            images = ImageFile.objects.filter(publisher=request.POST['username'])
+        if User.objects.filter(username=request.POST['username']) and UserAccount.objects.filter(name=request.POST['username']) is not None:
+            images = ImageFile.objects.filter(publisher__name=request.POST['username'])
             images_dict = {}
             counter = 0
             for x in images:
@@ -124,7 +124,7 @@ def get_my_posts(request):
 def get_my_favorites(request):
     if request.method == 'POST':
         if User.objects.filter(username=request.POST['username']) is not None:
-            images = ImageFile.objects.filter(favorite=request.POST['username'])
+            images = ImageFile.objects.filter(favorite__name=request.POST['username'])
             images_dict = {}
             counter = 0
             for x in images:
