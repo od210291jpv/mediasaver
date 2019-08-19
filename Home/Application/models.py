@@ -41,7 +41,7 @@ class ImageFile(models.Model):
     category = models.CharField(
         max_length=256,
         blank=True,
-        verbose_name = u'Category'
+        verbose_name=u'Category'
     )
 
     likes = models.IntegerField(
@@ -56,6 +56,15 @@ class ImageFile(models.Model):
         blank=True,
         null=True,
         verbose_name=u'Publisher'
+    )
+
+    favorite = models.ForeignKey(
+        UserAccount,
+        related_name=u'Fav',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        verbose_name=u'Is favorite'
     )
 
     def __unicode__(self):

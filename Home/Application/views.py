@@ -13,6 +13,7 @@ from django.contrib.auth import authenticate
 
 # Create your views here.
 
+
 def index(request):
     return render(request, 'index_new.html', {'portal_url': PORTAL_URL})
 
@@ -102,3 +103,35 @@ def login(request):
     else:
         # the authentication system was unable to verify the username and password
         return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+
+
+def get_my_posts(request):
+    if request.method == 'POST':
+        if User.objects.filter(username=request.POST['username']) is not None:
+            images = ImageFile.objects.filter(publisher=request.POST['username'])
+            images_dict = {}
+            counter = 0
+            for x in images:
+                images_dict[counter] = x.path.url
+                counter += 1
+            return JsonResponse(images_dict)
+        else:
+            return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def get_my_favorites(request):
+    if request.method == 'POST':
+        if User.objects.filter(username=request.POST['username']) is not None:
+            images = ImageFile.objects.filter(favorite=request.POST['username'])
+            images_dict = {}
+            counter = 0
+            for x in images:
+                images_dict[counter] = x.path.url
+                counter += 1
+            return JsonResponse(images_dict)
+        else:
+            return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
