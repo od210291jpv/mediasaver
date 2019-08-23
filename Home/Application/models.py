@@ -58,10 +58,10 @@ class ImageFile(models.Model):
         verbose_name=u'Publisher'
     )
 
-    favorite = models.ForeignKey(
+    favorite = models.ManyToManyField(
         UserAccount,
         related_name=u'Fav',
-        on_delete=models.CASCADE,
+        # on_delete=models.CASCADE,
         blank=True,
         null=True,
         verbose_name=u'Is favorite'

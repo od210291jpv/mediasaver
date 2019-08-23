@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from models import ImageFile
 from models import UserAccount
 from Home.settings import PORTAL_URL
@@ -135,3 +135,26 @@ def get_my_favorites(request):
             return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
     else:
         return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def add_to_favorites(request):
+    if request.method == 'POST':
+        user = User.objects.get(username=request.POST['username'])
+        if user is not None:
+            image = ImageFile.objects.get(name=request.POST['image_name'])
+            if image:
+                image.favorite.add(user.id)
+                return JsonResponse({'state': 'ok'})
+            else:
+                return JsonResponse({'state': 'error', 'reason': 'No image found'})
+        elif user is None:
+            return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+        else:
+            return JsonResponse({'state': 'error', 'reason': 'Error'})
+
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def remove_from_favorites(request):
+    pass
