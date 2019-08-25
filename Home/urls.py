@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^get_my_posts/$', get_my_posts, name='my_posts'),
     url(r'^get_my_favs/$', get_my_favorites, name='my_favorites'),
     url(r'^add_to_favs/$', add_to_favorites, name='add_favorites'),
+    url(r'^delete_from_favs/$', remove_from_favorites, name='delete_favorites'),
     url(r'^register/$', create_user, name='create_user'),
     url(r'^login/$', login, name='login')
 ]
