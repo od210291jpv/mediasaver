@@ -68,7 +68,7 @@ def images_json(request):
     counter = 0
     all_images = ImageFile.objects.all()
     for x in all_images:
-        images_dict[counter] = x.path.url
+        images_dict[counter] = [x.path.url, x.name]
         counter += 1
     return JsonResponse(images_dict)
 
@@ -127,7 +127,7 @@ def get_my_favorites(request):
             images_dict = {}
             counter = 0
             for x in images:
-                images_dict[counter] = x.path.url
+                images_dict[counter] = [x.path.url, x.name]
                 counter += 1
             return JsonResponse(images_dict)
         else:
