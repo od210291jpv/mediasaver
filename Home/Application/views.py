@@ -5,7 +5,7 @@ from models import ImageFile
 from models import UserAccount
 from Home.settings import PORTAL_URL
 from django.http import HttpResponseForbidden
-from models import ImageFile
+from models import ImageFile, UserAccount
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib.auth.models import User
@@ -122,7 +122,7 @@ def get_my_posts(request):
 
 def get_my_favorites(request):
     if request.method == 'POST':
-        if User.objects.filter(username=request.POST['username']) is not None:
+        if UserAccount.objects.filter(name=request.POST['username']) is not None:
             images = ImageFile.objects.filter(favorite__name=request.POST['username'])
             images_dict = {}
             counter = 0
@@ -138,7 +138,7 @@ def get_my_favorites(request):
 
 def add_to_favorites(request):
     if request.method == 'POST':
-        user = User.objects.get(username=request.POST['username'])
+        user = UserAccount.objects.get(name=request.POST['username'])
         if user is not None:
             image = ImageFile.objects.get(name=request.POST['image_name'])
             if image:
@@ -156,7 +156,7 @@ def add_to_favorites(request):
 
 def remove_from_favorites(request):
     if request.method == 'POST':
-        user = User.objects.get(username=request.POST['username'])
+        user = UserAccount.objects.get(name=request.POST['username'])
         if user:
             image = ImageFile.objects.get(name=request.POST['image_name'])
             if image:
