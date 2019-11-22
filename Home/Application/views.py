@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+import json
 
 # Create your views here.
 
@@ -75,13 +76,14 @@ def images_json(request):
 
 def create_user(request):
     if request.method == "POST":
-        registered_usr = User.objects.filter(username=request.POST['username'])
+        body = json.loads(request.body)
+        registered_usr = User.objects.filter(username=body['username'])
         if len(registered_usr) > 0:
             return HttpResponseForbidden("User already exists")
         else:
-            user = User.objects.create_user(request.POST['username'], request.POST['email'], request.POST['password'], is_active=False)
+            user = User.objects.create_user(body['username'], body['email'], body['password'], is_active=False)
             user.save()
-            user_acc = UserAccount(name=request.POST['username'])
+            user_acc = UserAccount(name=body['username'])
             user_acc.save()
             return JsonResponse({'state': 'ok'})
     else:
@@ -90,7 +92,8 @@ def create_user(request):
 
 def login(request):
     if request.method == 'POST':
-        user = authenticate(username=request.POST['username'], password=request.POST['password'])
+        body = json.loads(request.body)
+        user = authenticate(username=body['Username'], password=body['Password'])
     else:
         return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
     if user is not None:
@@ -106,8 +109,9 @@ def login(request):
 
 def get_my_posts(request):
     if request.method == 'POST':
-        if User.objects.filter(username=request.POST['username']) and UserAccount.objects.filter(name=request.POST['username']) is not None:
-            images = ImageFile.objects.filter(publisher__name=request.POST['username'])
+        body = json.loads(request.body)
+        if User.objects.filter(username=body['username']) and UserAccount.objects.filter(name=body['username']) is not None:
+            images = ImageFile.objects.filter(publisher__name=body['username'])
             images_dict = {}
             counter = 0
             for x in images:
@@ -122,8 +126,9 @@ def get_my_posts(request):
 
 def get_my_favorites(request):
     if request.method == 'POST':
-        if UserAccount.objects.filter(name=request.POST['username']) is not None:
-            images = ImageFile.objects.filter(favorite__name=request.POST['username'])
+        body = json.loads(request.body)
+        if UserAccount.objects.filter(name=body['username']) is not None:
+            images = ImageFile.objects.filter(favorite__name=body['username'])
             images_dict = {}
             counter = 0
             for x in images:
@@ -138,9 +143,10 @@ def get_my_favorites(request):
 
 def add_to_favorites(request):
     if request.method == 'POST':
-        user = UserAccount.objects.get(name=request.POST['username'])
+        body = json.loads(request.body)
+        user = UserAccount.objects.get(name=body['username'])
         if user is not None:
-            image = ImageFile.objects.get(name=request.POST['image_name'])
+            image = ImageFile.objects.get(name=body['image_name'])
             if image:
                 image.favorite.add(user.id)
                 return JsonResponse({'state': 'ok'})
@@ -156,9 +162,10 @@ def add_to_favorites(request):
 
 def remove_from_favorites(request):
     if request.method == 'POST':
-        user = UserAccount.objects.get(name=request.POST['username'])
+        body = json.loads(request.body)
+        user = UserAccount.objects.get(name=body['username'])
         if user:
-            image = ImageFile.objects.get(name=request.POST['image_name'])
+            image = ImageFile.objects.get(name=body['image_name'])
             if image:
                 image.favorite.remove(user.id)
                 return JsonResponse({'state': 'ok'})
