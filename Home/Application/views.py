@@ -65,13 +65,11 @@ def hidden_list(request):
 
 
 def images_json(request):
-    images_dict = {}
-    counter = 0
+    images_list = []
     all_images = ImageFile.objects.all()
     for x in all_images:
-        images_dict[counter] = [x.path.url, x.name]
-        counter += 1
-    return JsonResponse(images_dict)
+        images_list.append([x.path.url, x.name])
+    return JsonResponse({"publications": images_list})
 
 
 def create_user(request):
