@@ -68,7 +68,7 @@ def images_json(request):
     images_list = []
     all_images = ImageFile.objects.all()
     for x in all_images:
-        images_list.append([x.path.url, x.name])
+        images_list.append([x.path.url, x.name, x.id])
     return JsonResponse({"publications": images_list})
 
 
@@ -127,12 +127,10 @@ def get_my_favorites(request):
         body = json.loads(request.body)
         if UserAccount.objects.filter(name=body['username']) is not None:
             images = ImageFile.objects.filter(favorite__name=body['username'])
-            images_dict = {}
-            counter = 0
+            images_list = []
             for x in images:
-                images_dict[counter] = [x.path.url, x.name]
-                counter += 1
-            return JsonResponse(images_dict)
+                images_list.append([x.path.url, x.name, x.id])
+            return JsonResponse({"favorites": images_list})
         else:
             return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
     else:
@@ -144,7 +142,7 @@ def add_to_favorites(request):
         body = json.loads(request.body)
         user = UserAccount.objects.get(name=body['username'])
         if user is not None:
-            image = ImageFile.objects.get(name=body['image_name'])
+            image = ImageFile.objects.get(id=body['image_id'])
             if image:
                 image.favorite.add(user.id)
                 return JsonResponse({'state': 'ok'})
