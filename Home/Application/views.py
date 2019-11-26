@@ -125,8 +125,8 @@ def get_my_posts(request):
 def get_my_favorites(request):
     if request.method == 'POST':
         body = json.loads(request.body)
-        if UserAccount.objects.filter(name=body['username']) is not None:
-            images = ImageFile.objects.filter(favorite__name=body['username'])
+        if UserAccount.objects.filter(name=body['Username']) is not None:
+            images = ImageFile.objects.filter(favorite__name=body['Username'])
             images_list = []
             for x in images:
                 images_list.append([x.path.url, x.name, x.id])
