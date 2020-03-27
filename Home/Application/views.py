@@ -160,8 +160,8 @@ def remove_from_favorites(request):
     if request.method == 'POST':
         body = json.loads(request.body)
         user = UserAccount.objects.get(name=body['username'])
-        if user:
-            image = ImageFile.objects.get(name=body['image_name'])
+        if user is not None:
+            image = ImageFile.objects.get(id=body['image_id'])
             if image:
                 image.favorite.remove(user.id)
                 return JsonResponse({'state': 'ok'})
@@ -169,5 +169,32 @@ def remove_from_favorites(request):
                 return JsonResponse({'state': 'error', 'reason': 'No image found'})
         else:
             return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def is_favorite(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        requested_image = ImageFile.objects.get(id=body['image_id'])
+        if UserAccount.objects.filter(name=body['username']) is not None:
+            images = ImageFile.objects.filter(favorite__name=body['username'])
+            if requested_image and requested_image in images:
+                return JsonResponse({'state': 'true'})
+            else:
+                return JsonResponse({'state': 'false'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def remove_image(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        user = UserAccount.objects.get(name=body['username'])
+        if user is not None:
+            image = ImageFile.objects.get(id=body['image_id'])
+            if image:
+                ImageFile.objects.remove(id=image)
+
     else:
         return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
