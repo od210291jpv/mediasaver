@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from models import ImageFile
+from models import UserAccount
+from models import Category
 from Home.settings import PORTAL_URL
 from django.http import HttpResponseForbidden
-from models import ImageFile
+from models import ImageFile, UserAccount
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+import json
 
 # Create your views here.
+
 
 def index(request):
     return render(request, 'index_new.html', {'portal_url': PORTAL_URL})
@@ -61,25 +65,45 @@ def hidden_list(request):
     return render(request, 'hidden.html', {'images': all_images})
 
 
+def categories(request):
+    categories_list = {}
+    all_categories = Category.objects.all()
+    for x in all_categories:
+        categories_list[x.name] = x.id
+    return JsonResponse(categories_list)
+
+
+def cat_images(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        images = ImageFile.objects.filter(category__id=body['id'])
+        images_list = []
+        for x in images:
+            images_list.append([x.path.url, x.name, x.id])
+        return JsonResponse({"cat_images": images_list})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
 def images_json(request):
-    images_dict = {}
-    counter = 0
+    images_list = []
     all_images = ImageFile.objects.all()
     for x in all_images:
-        images_dict[counter] = x.path.url
-        counter += 1
-    return JsonResponse(images_dict)
+        images_list.append([x.path.url, x.name, x.id])
+    return JsonResponse({"publications": images_list})
 
 
 def create_user(request):
     if request.method == "POST":
-        registered_usr = User.objects.filter(username=request.POST['username'])
+        body = json.loads(request.body)
+        registered_usr = User.objects.filter(username=body['username'])
         if len(registered_usr) > 0:
             return HttpResponseForbidden("User already exists")
-            pass
         else:
-            user = User.objects.create_user(request.POST['username'], request.POST['email'], request.POST['password'], is_active=False)
+            user = User.objects.create_user(body['username'], body['email'], body['password'], is_active=False)
             user.save()
+            user_acc = UserAccount(name=body['username'])
+            user_acc.save()
             return JsonResponse({'state': 'ok'})
     else:
         return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
@@ -87,7 +111,8 @@ def create_user(request):
 
 def login(request):
     if request.method == 'POST':
-        user = authenticate(username=request.POST['username'], password=request.POST['password'])
+        body = json.loads(request.body)
+        user = authenticate(username=body['Username'], password=body['Password'])
     else:
         return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
     if user is not None:
@@ -99,3 +124,96 @@ def login(request):
     else:
         # the authentication system was unable to verify the username and password
         return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+
+
+def get_my_posts(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        if User.objects.filter(username=body['username']) and UserAccount.objects.filter(name=body['username']) is not None:
+            images = ImageFile.objects.filter(publisher__name=body['username'])
+            images_dict = {}
+            counter = 0
+            for x in images:
+                images_dict[counter] = x.path.url
+                counter += 1
+            return JsonResponse(images_dict)
+        else:
+            return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def get_my_favorites(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        if UserAccount.objects.filter(name=body['Username']) is not None:
+            images = ImageFile.objects.filter(favorite__name=body['Username'])
+            images_list = []
+            for x in images:
+                images_list.append([x.path.url, x.name, x.id])
+            return JsonResponse({"favorites": images_list})
+        else:
+            return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def add_to_favorites(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        user = UserAccount.objects.get(name=body['username'])
+        if user is not None:
+            image = ImageFile.objects.get(id=body['image_id'])
+            if image:
+                image.favorite.add(user.id)
+                return JsonResponse({'state': 'ok'})
+            else:
+                return JsonResponse({'state': 'error', 'reason': 'No image found'})
+        elif user is None:
+            return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+        else:
+            return JsonResponse({'state': 'error', 'reason': 'Error'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def remove_from_favorites(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        user = UserAccount.objects.get(name=body['username'])
+        if user is not None:
+            image = ImageFile.objects.get(id=body['image_id'])
+            if image:
+                image.favorite.remove(user.id)
+                return JsonResponse({'state': 'ok'})
+            else:
+                return JsonResponse({'state': 'error', 'reason': 'No image found'})
+        else:
+            return JsonResponse({'state': 'error', 'reason': 'authentication failed'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def is_favorite(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        requested_image = ImageFile.objects.get(id=body['image_id'])
+        if UserAccount.objects.filter(name=body['username']) is not None:
+            images = ImageFile.objects.filter(favorite__name=body['username'])
+            if requested_image and requested_image in images:
+                return JsonResponse({'state': 'true'})
+            else:
+                return JsonResponse({'state': 'false'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
+
+
+def remove_image(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        user = UserAccount.objects.get(name=body['username'])
+        if user is not None:
+            ImageFile.objects.filter(id=body['image_id']).delete()
+            return JsonResponse({'state': 'true'})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
