@@ -21,6 +21,17 @@ class UserAccount(models.Model):
         return "%s %s" % (self.name, self.avatar)
 
 
+class Category(models.Model):
+
+    name = models.CharField(
+        max_length=256,
+        blank=True
+    )
+
+    def __unicode__(self):
+        return u'%s' % (self.name)
+
+
 class ImageFile(models.Model):
 
     class Meta(object):
@@ -36,12 +47,6 @@ class ImageFile(models.Model):
         max_length=256,
         blank=False,
         verbose_name=u'Image name'
-    )
-
-    category = models.CharField(
-        max_length=256,
-        blank=True,
-        verbose_name=u'Category'
     )
 
     likes = models.IntegerField(
@@ -67,13 +72,16 @@ class ImageFile(models.Model):
         verbose_name=u'Is favorite'
     )
 
-    def __unicode__(self):
-        return u'%s %s %s %s' % (self.path, self.name, self.category, self.likes)
-
-
-class Category(models.Model):
-
-    name = models.CharField(
-        max_length=256,
-        blank=True
+    category = models.ManyToManyField(
+        Category,
+        related_name=u'Category',
+        blank=True,
+        null=True,
+        verbose_name=u'Image category'
     )
+
+    def __unicode__(self):
+        return u'%s %s %s %s' % (self.path, self.name, self.likes, self.category)
+
+
+

@@ -24,6 +24,8 @@ from Application.views import *
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^images/$', images_list, name='images'),
+    url(r'^categories/$', categories, name='categories'),
+    url(r'^category_images/$', cat_images),
     url(r'^hidden/$', hidden_list, name='hidden'),
     url(r'^$', index, name='index'),
     url(r'^test/$', test, name='test'),
@@ -33,6 +35,7 @@ urlpatterns = [
     url(r'^get_my_favs/$', get_my_favorites, name='my_favorites'),
     url(r'^add_to_favs/$', add_to_favorites, name='add_favorites'),
     url(r'^delete_from_favs/$', remove_from_favorites, name='delete_favorites'),
+    url(r'^remove_image/$', remove_image, name='remove_image'),
     url(r'^is_favorite/$', is_favorite, name='is_favorite'),
     url(r'^register/$', create_user, name='create_user'),
     url(r'^login/$', login, name='login')

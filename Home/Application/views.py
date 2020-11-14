@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from models import ImageFile
 from models import UserAccount
+from models import Category
 from Home.settings import PORTAL_URL
 from django.http import HttpResponseForbidden
 from models import ImageFile, UserAccount
@@ -62,6 +63,26 @@ def hidden_list(request):
     except EmptyPage:
         all_images = paginator.page(paginator.num_pages)
     return render(request, 'hidden.html', {'images': all_images})
+
+
+def categories(request):
+    categories_list = {}
+    all_categories = Category.objects.all()
+    for x in all_categories:
+        categories_list[x.name] = x.id
+    return JsonResponse(categories_list)
+
+
+def cat_images(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        images = ImageFile.objects.filter(category__id=body['id'])
+        images_list = []
+        for x in images:
+            images_list.append([x.path.url, x.name, x.id])
+        return JsonResponse({"cat_images": images_list})
+    else:
+        return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
 
 
 def images_json(request):
@@ -192,9 +213,7 @@ def remove_image(request):
         body = json.loads(request.body)
         user = UserAccount.objects.get(name=body['username'])
         if user is not None:
-            image = ImageFile.objects.get(id=body['image_id'])
-            if image:
-                ImageFile.objects.remove(id=image)
-
+            ImageFile.objects.filter(id=body['image_id']).delete()
+            return JsonResponse({'state': 'true'})
     else:
         return JsonResponse({'state': 'error', 'reason': 'incorrect request method'})
